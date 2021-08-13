@@ -7202,7 +7202,7 @@ setTimeout(function(){
                     document.getElementsByName('audiocodec_sel')[0].value =12;
                 } 
 
-                副标题如果没有就取中文名
+                //副标题如果没有就取中文名
                 if (nulljudgeByName('small_descr')){
                     document.getElementsByName('small_descr')[0].value =document.getElementsByName('cn_name')[0].value;
                 }
