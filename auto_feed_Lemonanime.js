@@ -55,7 +55,7 @@
 // @resource     ptpdouban https://greasyfork.org/scripts/425274-ptp-douban-info/code/ptp_douban_info.js?version=957815
 // @icon         https://kp.m-team.cc//favicon.ico
 // @run-at       document-end
-// @version      1.11
+// @version      1.12
 // @grant        GM_xmlhttpRequest
 // @grant        GM_setClipboard
 // @grant        GM_setValue
@@ -681,6 +681,7 @@ const default_site_info = {
     'JoyHD': {'url': 'https://www.joyhd.net/', 'enable': 1},
     'KG': {'url': 'https://karagarga.in/', 'enable': 1},
     'LemonHD': {'url': 'https://lemonhd.org/', 'enable': 1},
+    'LemonHD-Anime': {'url': 'https://lemonhd.org/', 'enable': 1},
     'MTeam': {'url': 'https://kp.m-team.cc/', 'enable': 1},
     'NanYang': {'url': 'https://nanyangpt.com/', 'enable': 1},
     'NPUPT': {'url': 'https://npupt.com/', 'enable': 1},
@@ -791,6 +792,7 @@ const reg_team_name = {
     'HDChina': /-(HDC)/i,
     'PTer': /-(Pter|.*Pter)/i,
     'LemonHD': /-(LHD|i18n|League.*)/i,
+    'LemonHD-Anime': /-(LHD|i18n|League.*)/i,
     'HDHome': /-hdh/i,
     'PThome': /(-pthome|-pth|.*@pth)/i,
     'PuTao': /-putao/i,
@@ -2166,7 +2168,7 @@ function init_buttons_for_transfer(container, site, mode, raw_info) {
     douban_button.style.marginLeft = '12px';
     container.appendChild(douban_button);
 
-    if (['PHD','avz', 'CNZ', 'FileList', 'HDChina', 'TTG', 'LemonHD', 'PTP'].indexOf(site) > -1) {
+    if (['PHD','avz', 'CNZ', 'FileList', 'HDChina', 'TTG', 'LemonHD','LemonHD-Anime', 'PTP'].indexOf(site) > -1) {
         var download_button = document.createElement('input');
         download_button.type = "button";
         download_button.id = 'download_pngs';
@@ -2299,7 +2301,7 @@ function init_buttons_for_transfer(container, site, mode, raw_info) {
         }
     }
 
-    if (['HDB','PHD','avz', 'CNZ', 'FileList', 'HDChina', 'TTG', 'LemonHD'].indexOf(site) > -1) {
+    if (['HDB','PHD','avz', 'CNZ', 'FileList', 'HDChina', 'TTG', 'LemonHD' , 'LemonHD-Anime'].indexOf(site) > -1) {
         var width = textarea.style.width.match(/\d+/)[0];
         if (site == 'PHD' || site == 'avz' || site == 'CNZ') {
             textarea.style.width = `${parseInt(width) + 90}px`;
@@ -2379,6 +2381,8 @@ function set_jump_href(raw_info, mode) {
                     forward_url = used_site_info[key].url + 'upload_music.php';
                 } else if (key == 'LemonHD' && (raw_info.type == '动漫')) {
                     forward_url = used_site_info[key].url + 'upload_animate.php';
+                } else if (key == 'LemonHD-Anime') {
+                    forward_url = used_site_info[key].url + 'upload_animate.php';
                 } else if (key == 'LemonHD' && (raw_info.type == '纪录')) {
                     forward_url = used_site_info[key].url + 'upload_doc.php';
                 } else if (key == 'LemonHD') {
@@ -2417,6 +2421,8 @@ function set_jump_href(raw_info, mode) {
                     } else if (key == 'LemonHD' && (raw_info.type == '音乐')) {
                         forward_url = used_site_info[key].url + 'torrents_music.php?search={url}&search_area=imdb&suggest=4'.format({'url': url});
                     } else if (key == 'LemonHD' && (raw_info.type == '动漫')) {
+                        forward_url = used_site_info[key].url + 'torrents_animate.php?search={url}&search_area=imdb&suggest=4'.format({'url': url});
+                    } else if (key == 'LemonHD-Anime') {
                         forward_url = used_site_info[key].url + 'torrents_animate.php?search={url}&search_area=imdb&suggest=4'.format({'url': url});
                     } else if (key == 'LemonHD' && (raw_info.type == '纪录')) {
                         forward_url = used_site_info[key].url + 'torrents_doc.php?search={url}&search_area=imdb&suggest=4'.format({'url': url});
@@ -3744,7 +3750,7 @@ setTimeout(function(){
                 }
             }
 
-            if (origin_site == 'HDChina' || origin_site == 'TTG' || origin_site == 'LemonHD'){
+            if (origin_site == 'HDChina' || origin_site == 'TTG' || origin_site == 'LemonHD' || origin_site == 'LemonHD-Anime'){
                 if (raw_info.descr.search(/主.*演/i) < 0 && raw_info.descr.search(/类.*别/i) < 0){
                     var douban_content = document.getElementsByClassName('douban_content');
                     if (douban_content[0]){
@@ -4697,7 +4703,7 @@ setTimeout(function(){
                                 douban_box = table.insertRow(6);
                             } else {
                                 insert_row = table.insertRow(i / 2 + 1);
-                                if ((origin_site == 'LemonHD' || origin_site == 'MTeam') && douban_button_needed) {
+                                if ((origin_site == 'LemonHD' || origin_site == 'LemonHD-Anime' || origin_site == 'MTeam') && douban_button_needed) {
                                     douban_box = table.insertRow(i / 2 + 1);
                                 }
                             }
@@ -5593,6 +5599,7 @@ setTimeout(function(){
             raw_info.descr = raw_info.descr.replace('[quote]\nOP From', '[/quote]\r\n[quote]\r\nOP From');
             raw_info.descr = raw_info.descr.replace('[quote]\nOP&ED', '[/quote]\r\n[quote]\r\nOP&ED');
 
+
             raw_info.animate_info = raw_info.name;
             raw_info.name = raw_info.name.replace(/\[|\]/g, ' ').replace(/ +/g, ' ');
             raw_info.type = '动漫';
@@ -5620,6 +5627,12 @@ setTimeout(function(){
                 raw_info.animate_info = raw_info.name;
                 raw_info.name = raw_info.name.split('    ')[0].replace(/\[|\]/g, ' ').replace(/\(.*\)/, '').replace(/ +/g, ' ');
             }
+        }
+
+        if (origin_site  == 'LemonHD-Anime'){
+                raw_info.type == '动漫';
+                raw_info.animate_info = raw_info.name;
+                raw_info.name = raw_info.name.split('    ')[0].replace(/\[|\]/g, ' ').replace(/\(.*\)/, '').replace(/ +/g, ' ');
         }
 
         if (origin_site  == 'HDArea'){
@@ -6002,6 +6015,8 @@ setTimeout(function(){
         var if_exclusive = false;
         if (origin_site == 'LemonHD' && $('#outer').find('.tag_jz').length) {
             if_exclusive = true;
+        } else if (origin_site == 'LemonHD-Anime' && $('#outer').find('.tag_jz').length) {
+            if_exclusive = true;
         } else if (origin_site == 'HaresClub' && ( $('#outer').find('.jz').length || $('#outer').find('.xz').length)) {
             if_exclusive = true;
         } else if (origin_site == 'PTer' && $('#kdescr').parent().parent().parent().find('a[href*="tag_exclusive=yes"]').length) {
@@ -6202,7 +6217,7 @@ setTimeout(function(){
             //站点资源明确禁转的规则优先
             if (search_mode){
                 if (origin_site == 'FRDS' || raw_info.name.match(/frds/i)) {
-                    if (['LemonHD', 'CMCT', 'OurBits', 'HDChina', 'HDSky'].indexOf(e.target.id) > -1) {
+                    if (['LemonHD','LemonHD-Anime', 'CMCT', 'OurBits', 'HDChina', 'HDSky'].indexOf(e.target.id) > -1) {
                         e.preventDefault();
                         alert('不支持该站资源转发！');
                         return;
@@ -6641,6 +6656,8 @@ setTimeout(function(){
             }
             raw_info.descr = raw_info.descr + raw_info.log_info + raw_info.tracklist;
         } else if (upload_site.match(/animate/i) && forward_site == 'LemonHD'){
+            LemonHD_animate = true;
+        } else if (upload_site.match(/animate/i) && forward_site == 'LemonHD-Anime'){
             LemonHD_animate = true;
         } else if (upload_site.match(/upload_doc/i) && forward_site == 'LemonHD'){
             LemonHD_documentary = true;
@@ -7202,12 +7219,11 @@ setTimeout(function(){
                     document.getElementsByName('audiocodec_sel')[0].value =12;
                 } 
 
+
                 //副标题如果没有就取中文名
                 if (nulljudgeByName('small_descr')){
                     document.getElementsByName('small_descr')[0].value =document.getElementsByName('cn_name')[0].value;
                 }
-
-
 
 
                 if (raw_info.animate_info.match(/日漫/)){
